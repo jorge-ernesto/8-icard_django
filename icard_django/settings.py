@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import datetime
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +27,7 @@ SECRET_KEY = 'django-insecure-p@9oh=m=lug$%^=t#)*p91qnvj71-t1j1+6*442nze_5#t&6x+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -37,11 +39,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',  # pip install djangorestframework
+    'drf_yasg',  # pip install drf-yasg
+    'corsheaders',  # pip install django-cors-headers
+    'django_filters',  # pip install django-filter
+    'users',
+    'categories',
+    'products',
+    'tables',
+    'orders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -103,9 +115,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-es' # en-us
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Lima' # UTC
 
 USE_I18N = True
 
@@ -121,3 +133,37 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Modificando el modelo del usuario
+AUTH_USER_MODEL = 'users.User'
+
+# Creando endpoint de login con JWT en Django
+'''
+Explicación ChatGPT
+Esta configuración en Django Rest Framework (DRF) establece la autenticación predeterminada para la API utilizando la biblioteca Simple JWT.
+Simple JWT es una biblioteca que proporciona tokens JSON Web (JWT) para la autenticación de usuarios en aplicaciones Django. JWT es un estándar abierto que define una forma segura de transmitir información entre las partes como un objeto JSON. En el contexto de autenticación, un token JWT puede contener información del usuario como su ID, roles y otros datos necesarios para autenticar al usuario en una API.
+La configuración especifica que la clase de autenticación por defecto será JWTAuthentication de Simple JWT. Esto significa que en todas las vistas protegidas por autenticación, el usuario debe proporcionar un token JWT válido en la cabecera de la solicitud HTTP para acceder a ellas.
+En resumen, esta configuración establece Simple JWT como el método de autenticación predeterminado para la API de DRF.
+
+Notas
+- Una vez realizada esta configuración, la unica forma de realizar solicitudes a una ruta protegida, es por medio de una herramienta como Postman, que permita pasarle el token a la solicitud HTTP
+- Si queremos realizar la solicitud por "drf-yasg" (generador de Swagger) ----> "http://localhost:8000/docs/", debemos comentar esta configuración y loguearnos en ----> "http://localhost:8000/admin/"
+'''
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # pip install djangorestframework-simplejwt
+    )
+}
+
+# Creando endpoint de login con JWT en Django
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=365)
+}
+
+# Realizando login y configurando CORS
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
